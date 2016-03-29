@@ -6,12 +6,15 @@ import java.util.Map;
 
 import com.gotye.api.GotyeGroup;
 import com.gotye.api.GotyeUser;
+import com.melink.bqmmsdk.sdk.BQMM;
 import com.open_demo.main.MainActivity;
 
 import android.R.integer;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.text.TextUtils;
 
  
@@ -42,6 +45,22 @@ public class MyApplication extends Application {
 		loadSelectedKey(this);
 		CrashApplication.getInstance(this).onCreate();
 		spf = getSharedPreferences(SHARE_PREFERENCE_NAME, Context.MODE_PRIVATE);
+		initBQMMSdk();
+	}
+
+	/**
+	 * 初始化表情MM SDK
+	 */
+	private void initBQMMSdk() {
+		/**
+		 * 首先从AndroidManifest.xml中取得appId和appSecret，然后对BQMM SDK进行初始化
+		 */
+		try {
+			Bundle bundle = getPackageManager().getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA).metaData;
+			BQMM.getInstance().initConfig(this, bundle.getString("bqmm_app_id"), bundle.getString("bqmm_app_secret"));
+		} catch (PackageManager.NameNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 
 	void onLoginCallBack(int code, GotyeUser currentLoginUser) {
