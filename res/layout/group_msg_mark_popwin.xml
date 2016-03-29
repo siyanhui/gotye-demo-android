@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/switch_bg_holo_dark"
+    android:orientation="vertical" >
+    
+    <RelativeLayout
+        android:id="@+id/select_linear_one" 
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="接收不提醒"
+            android:textSize="20dp"
+            android:textColor="#319adc" />
+        <ImageView
+            android:id="@+id/check_one" 
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginRight="15dp"
+            android:layout_alignParentRight="true"
+            android:visibility="gone"
+            android:src="@drawable/user_selected"/>
+    </RelativeLayout>
+    <View 
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@drawable/break_line"/>
+    
+     <RelativeLayout
+        android:id="@+id/select_linear_two"  
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center_vertical">
+		  <TextView 
+		      android:layout_width="match_parent"
+		      android:layout_height="wrap_content"
+		      android:gravity="center"
+		      android:text="接收并提醒"
+		      android:textColor="#319adc"
+		      android:textSize="20dp"/>
+		  <ImageView 
+		      	  android:id="@+id/check_two"
+		          android:layout_width="20dp"
+		          android:layout_height="20dp"
+		          android:layout_marginRight="15dp"
+		          android:layout_alignParentRight="true"
+		          android:visibility="gone"
+		          android:src="@drawable/user_selected"/>
+    </RelativeLayout>
+    <View 
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@drawable/break_line"/>
+    
+    <RelativeLayout
+        android:id="@+id/select_linear_three"  
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center_vertical">
+	   <TextView 
+	       android:layout_width="wrap_content"
+	       android:layout_height="wrap_content"
+	       android:layout_centerHorizontal="true"
+	       android:text="屏蔽群消息"
+	       android:textColor="#319adc"
+	       android:textSize="20dp"/>
+	    <ImageView
+	           android:id="@+id/check_three" 
+	           android:layout_width="20dp"
+	           android:layout_height="20dp"
+	           android:layout_marginRight="15dp"
+	           android:layout_alignParentRight="true"
+	           android:visibility="gone"
+	           android:src="@drawable/user_selected"/>
+    </RelativeLayout>
+    <View 
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:background="@drawable/break_line"/>
+    
+    <RelativeLayout
+        android:id="@+id/select_linear_four"  
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center_vertical">
+	   <TextView 
+	       android:layout_width="match_parent"
+	       android:layout_height="wrap_content"
+	       android:gravity="center"
+	       android:text="取消"
+	       android:textColor="#319adc"
+	       android:textSize="20dp"/>
+    </RelativeLayout>
+
+</LinearLayout>
