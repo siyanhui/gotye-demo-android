@@ -62,7 +62,10 @@ import com.gotye.api.GotyeRoom;
 import com.gotye.api.GotyeStatusCode;
 import com.gotye.api.GotyeUser;
 import com.gotye.api.WhineMode;
+import com.melink.bqmmsdk.bean.Emoji;
 import com.melink.bqmmsdk.sdk.BQMM;
+import com.melink.bqmmsdk.sdk.BQMMMessageHelper;
+import com.melink.bqmmsdk.sdk.IBqmmSendMessageListener;
 import com.melink.bqmmsdk.ui.keyboard.BQMMKeyboard;
 import com.melink.bqmmsdk.widget.BQMMEditView;
 import com.melink.bqmmsdk.widget.BQMMSendButton;
@@ -78,6 +81,10 @@ import com.open_demo.util.ToastUtil;
 import com.open_demo.util.URIUtil;
 import com.open_demo.view.RTPullListView;
 import com.open_demo.view.RTPullListView.OnRefreshListener;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class ChatPage extends FragmentActivity implements OnClickListener {
 	public static final int REALTIMEFROM_OTHER = 2;
@@ -124,6 +131,11 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 	public GotyeAPI api=GotyeAPI.getInstance();
 	boolean isClick = false;
 
+	/**
+	 * 两种表情消息类型，前者为图文混排表情，后者为大表情
+	 */
+	public static final String EMOJITYPE = "emojitype";
+	public static final String FACETYPE = "facetype";
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -326,6 +338,73 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 		bqmm.setKeyboard(keyboard);
 		bqmm.setSendButton(sendMessage);
 		bqmm.load();
+		/**
+		 * 在有表情消息需要发送的时候，表情MM SDK会调用这个监听器中的回调，发送消息的代码要写在这里
+		 */
+		bqmm.setBqmmSendMsgListener(new IBqmmSendMessageListener() {
+			/**
+			 * 在用户点击大表情时会调用这个函数
+			 *
+			 * @param face
+			 */
+			@Override
+			public void onSendFace(Emoji face) {
+				JSONArray msgCodes = BQMMMessageHelper.getFaceMessageData(face);
+				sendFaceText(BQMMMessageHelper.getFaceMessageString(face), msgCodes, FACETYPE);
+			}
+
+			/**
+			 * 在用户编辑了文字消息并点击发送时会调用这个函数
+			 *
+			 * @param emojis
+			 * @param isMixedMessage
+			 */
+			@Override
+			public void onSendMixedMessage(List<Object> emojis, boolean isMixedMessage) {
+				String msgString = BQMMMessageHelper.getMixedMessageString(emojis);
+				//判断一下是纯文本还是富文本
+				if (isMixedMessage) {
+					JSONArray msgCodes = BQMMMessageHelper.getMixedMessageData(emojis);
+					sendFaceText(msgString, msgCodes, EMOJITYPE);
+				} else {
+					sendTextMessage(msgString);
+				}
+			}
+		});
+
+	}
+
+	/**
+	 * 发送表情消息
+	 */
+	public void sendFaceText(String content, JSONArray msgData, String type) {
+		if (content.length() > 0) {
+			GotyeMessage toSend = null;
+			if (chatType == 0) {
+				toSend = GotyeMessage.createTextMessage(currentLoginUser, o_user, content);
+			} else if (chatType == 1) {
+				toSend = GotyeMessage.createTextMessage(currentLoginUser, o_room, content);
+			} else if (chatType == 2) {
+				toSend = GotyeMessage.createTextMessage(currentLoginUser, o_group, content);
+			} else if (chatType == 3) {
+				toSend = GotyeMessage.createTextMessage(currentLoginUser, o_cserver, content);
+			}
+			if (toSend != null) try {
+				/**
+				 * 将表情的信息进行封装，放到消息的extraData中
+				 */
+				JSONObject extra = new JSONObject();
+				extra.put("txt_msgType", type);
+				extra.put("msg_data", msgData);
+				toSend.putExtraData(extra.toString().getBytes());
+				int code = api.sendMessage(toSend);
+				Log.d("", String.valueOf(code));
+				adapter.addMsgToBottom(toSend);
+				refreshToTail();
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	private void sendTextMessage(String text) {

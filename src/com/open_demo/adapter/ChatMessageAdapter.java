@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -34,6 +35,10 @@ import com.open_demo.util.GotyeVoicePlayClickPlayListener;
 import com.open_demo.util.ImageCache;
 import com.open_demo.util.TimeUtil;
 import com.open_demo.util.ToastUtil;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class ChatMessageAdapter extends BaseAdapter {
 
@@ -308,6 +313,21 @@ public class ChatMessageAdapter extends BaseAdapter {
 				message.getExtraData());
 		if (extraData != null) {
 			if (message.getType() == GotyeMessageType.GotyeMessageTypeText) {
+				try {
+					/**
+					 * 封装到extraData中的表情消息在此被解读，判断表情消息的类型，做出相应处理
+					 */
+					JSONObject extraObject = new JSONObject(extraData);
+					String type = extraObject.getString("txt_msgType");
+					JSONArray data = extraObject.getJSONArray("msg_data");
+					if (type.equals(ChatPage.FACETYPE)) {
+						Log.e("haha", "got a face!");
+					} else {
+						Log.e("haha", "got a emoji!");
+					}
+				} catch (JSONException | NullPointerException e) {
+					e.printStackTrace();
+				}
 				holder.tv.setText(message.getText() + "\n额外数据：" + extraData);
 			} else {
 				holder.tv.setText("自定义消息：" + new String(message.getUserData())
