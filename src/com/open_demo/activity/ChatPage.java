@@ -21,6 +21,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -61,6 +62,10 @@ import com.gotye.api.GotyeRoom;
 import com.gotye.api.GotyeStatusCode;
 import com.gotye.api.GotyeUser;
 import com.gotye.api.WhineMode;
+import com.melink.bqmmsdk.sdk.BQMM;
+import com.melink.bqmmsdk.ui.keyboard.BQMMKeyboard;
+import com.melink.bqmmsdk.widget.BQMMEditView;
+import com.melink.bqmmsdk.widget.BQMMSendButton;
 import com.open_demo.R;
 import com.open_demo.adapter.ChatMessageAdapter;
 import com.open_demo.main.MainActivity;
@@ -74,7 +79,7 @@ import com.open_demo.util.URIUtil;
 import com.open_demo.view.RTPullListView;
 import com.open_demo.view.RTPullListView.OnRefreshListener;
 
-public class ChatPage extends Activity implements OnClickListener {
+public class ChatPage extends FragmentActivity implements OnClickListener {
 	public static final int REALTIMEFROM_OTHER = 2;
 	public static final int REALTIMEFROM_SELF = 1;
 	public static final int REALTIMEFROM_NO = 0;
@@ -91,7 +96,9 @@ public class ChatPage extends Activity implements OnClickListener {
 	private GotyeUser currentLoginUser;
 	private ImageView voice_text_chage;
 	private Button pressToVoice;
-	private EditText textMessage;
+	private BQMMEditView textMessage;
+	private BQMMSendButton sendMessage;
+	private BQMMKeyboard keyboard;
 	private ImageView showMoreType;
 	private LinearLayout moreTypeLayout;
 
@@ -204,7 +211,7 @@ public class ChatPage extends Activity implements OnClickListener {
 
 		voice_text_chage = (ImageView) findViewById(R.id.send_voice);
 		pressToVoice = (Button) findViewById(R.id.press_to_voice_chat);
-		textMessage = (EditText) findViewById(R.id.text_msg_input);
+		textMessage = (BQMMEditView) findViewById(R.id.text_msg_input);
 		showMoreType = (ImageView) findViewById(R.id.more_type);
 		moreTypeLayout = (LinearLayout) findViewById(R.id.more_type_layout);
 
@@ -301,6 +308,24 @@ public class ChatPage extends Activity implements OnClickListener {
 		pullListView.setAdapter(adapter);
 		pullListView.setSelection(adapter.getCount());
 		setListViewInfo();
+
+		/**
+		 * 初始化表情MM UI组件
+		 */
+		keyboard = (BQMMKeyboard) findViewById(R.id.emoji_keyboard);
+		findViewById(R.id.emoji).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				moreTypeLayout.setVisibility(View.GONE);
+				keyboard.setVisibility(View.VISIBLE);
+			}
+		});
+		sendMessage = (BQMMSendButton) findViewById(R.id.send_message);
+		BQMM bqmm = BQMM.getInstance();
+		bqmm.setEditView(textMessage);
+		bqmm.setKeyboard(keyboard);
+		bqmm.setSendButton(sendMessage);
+		bqmm.load();
 	}
 
 	private void sendTextMessage(String text) {
@@ -665,8 +690,14 @@ public class ChatPage extends Activity implements OnClickListener {
 				voice_text_chage
 						.setImageResource(R.drawable.voice_btn_selector);
 				showMoreType.setImageResource(R.drawable.send_selector);
+				/**
+				 * 在应发送文字时，隐藏“更多”按钮
+				 */
+				showMoreType.setVisibility(View.GONE);
+				sendMessage.setVisibility(View.VISIBLE);
 				moreTypeForSend = true;
 				moreTypeLayout.setVisibility(View.GONE);
+				keyboard.setVisibility(View.GONE);
 			} else {
 				pressToVoice.setVisibility(View.VISIBLE);
 				textMessage.setVisibility(View.GONE);
@@ -675,6 +706,11 @@ public class ChatPage extends Activity implements OnClickListener {
 						.setImageResource(R.drawable.change_to_text_press);
 
 				showMoreType.setImageResource(R.drawable.more_type_selector);
+				/**
+				 * 在应选择更多操作时，显示“更多”按钮
+				 */
+				showMoreType.setVisibility(View.VISIBLE);
+				sendMessage.setVisibility(View.GONE);
 				moreTypeForSend = false;
 				hideKeyboard();
 			}
@@ -689,17 +725,29 @@ public class ChatPage extends Activity implements OnClickListener {
 			} else {
 				if (moreTypeLayout.getVisibility() == View.VISIBLE) {
 					moreTypeLayout.setVisibility(View.GONE);
+					keyboard.setVisibility(View.GONE);
+					pressToVoice.setVisibility(View.VISIBLE);
+					textMessage.setVisibility(View.GONE);
+					voice_text_chage.setImageResource(R.drawable.change_to_text_press);
+					showMoreType.setVisibility(View.VISIBLE);
+					sendMessage.setVisibility(View.GONE);
 				} else {
 					moreTypeLayout.setVisibility(View.VISIBLE);
+					keyboard.setVisibility(View.GONE);
 					if (chatType == 1 && api.supportRealtime(room) == true) {
 						moreTypeLayout.findViewById(R.id.real_time_voice_chat)
 								.setVisibility(View.VISIBLE);
 					}
-					
+
 //					else if(chatType == 0){
 //						moreTypeLayout.findViewById(R.id.voice_to_text)
 //						.setVisibility(View.VISIBLE);
 //				}
+					pressToVoice.setVisibility(View.GONE);
+					textMessage.setVisibility(View.VISIBLE);
+					voice_text_chage.setImageResource(R.drawable.voice_btn_selector);
+					showMoreType.setVisibility(View.GONE);
+					sendMessage.setVisibility(View.VISIBLE);
 
 				}
 			}
@@ -744,6 +792,7 @@ public class ChatPage extends Activity implements OnClickListener {
 		}
 		api.startTalk(room, WhineMode.DEFAULT, true, Voice_MAX_TIME_LIMIT);
 		moreTypeLayout.setVisibility(View.GONE);
+		keyboard.setVisibility(View.GONE);
 	}
 
 	public void hideKeyboard() {

@@ -118,7 +118,8 @@
                 android:layout_centerVertical="true"
                 android:src="@drawable/voice_btn_selector" />
 
-            <EditText
+            <!--将文字编辑框换成表情MM提供的BQMMEditView-->
+            <com.melink.bqmmsdk.widget.BQMMEditView
                 android:id="@+id/text_msg_input"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
@@ -150,13 +151,23 @@
                 android:textSize="20sp"
                 android:visibility="gone" />
 
+            <!--亲加Demo的发送按钮和“更多”功能按钮是共用的，这里我们增加一个发送按钮-->
+            <com.melink.bqmmsdk.widget.BQMMSendButton
+                android:id="@+id/send_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/send_selector" />
+
             <ImageView
                 android:id="@+id/more_type"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:src="@drawable/send_selector" />
+                android:src="@drawable/send_selector"
+                android:visibility="gone" />
         </RelativeLayout>
 
         <LinearLayout
@@ -199,7 +210,22 @@
                 android:layout_weight="1"
                 android:src="@drawable/realtime_voice_selector"
                 android:visibility="gone" />
+
+            <!--增加一个用于打开表情键盘的按钮-->
+            <ImageView
+                android:id="@+id/emoji"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:src="@drawable/bqmm_emoji_loading"
+                android:visibility="visible" />
         </LinearLayout>
+        <!--增加表情键盘-->
+        <com.melink.bqmmsdk.ui.keyboard.BQMMKeyboard
+            android:id="@+id/emoji_keyboard"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:visibility="gone" />
     </LinearLayout>
 
 </RelativeLayout>
