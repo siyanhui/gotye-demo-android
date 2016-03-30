@@ -8,7 +8,6 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -26,6 +25,11 @@ import com.gotye.api.GotyeMessage;
 import com.gotye.api.GotyeMessageStatus;
 import com.gotye.api.GotyeMessageType;
 import com.gotye.api.GotyeUser;
+import com.melink.bqmmsdk.bean.Emoji;
+import com.melink.bqmmsdk.sdk.BQMM;
+import com.melink.bqmmsdk.sdk.BQMMMessageHelper;
+import com.melink.bqmmsdk.sdk.IFetchEmojisByCodeListCallback;
+import com.melink.bqmmsdk.widget.BQMMMessageView;
 import com.open_demo.R;
 import com.open_demo.activity.ChatPage;
 import com.open_demo.activity.ShowBigImage;
@@ -201,8 +205,10 @@ public class ChatMessageAdapter extends BaseAdapter {
 						.findViewById(R.id.msg_status);
 				holder.head_iv = (ImageView) convertView
 						.findViewById(R.id.iv_userhead);
-				// 这里是文字内容
-				holder.tv = (TextView) convertView
+				/**
+				 * 这里是表情MM的表情，或者文字内容
+				 */
+				holder.bv = (BQMMMessageView) convertView
 						.findViewById(R.id.tv_chatcontent);
 				holder.tv_userId = (TextView) convertView
 						.findViewById(R.id.tv_userid);
@@ -306,7 +312,7 @@ public class ChatMessageAdapter extends BaseAdapter {
 		}
 	}
 
-	private void handleTextMessage(final GotyeMessage message, ViewHolder holder,
+	private void handleTextMessage(final GotyeMessage message, final ViewHolder holder,
 			final int position) {
 		// 设置内容
 		String extraData = message.getExtraData() == null ? null : new String(
@@ -321,25 +327,44 @@ public class ChatMessageAdapter extends BaseAdapter {
 					String type = extraObject.getString("txt_msgType");
 					JSONArray data = extraObject.getJSONArray("msg_data");
 					if (type.equals(ChatPage.FACETYPE)) {
-						Log.e("haha", "got a face!");
-					} else {
-						Log.e("haha", "got a emoji!");
-					}
-				} catch (JSONException | NullPointerException e) {
-					e.printStackTrace();
-				}
-				holder.tv.setText(message.getText() + "\n额外数据：" + extraData);
-			} else {
-				holder.tv.setText("自定义消息：" + new String(message.getUserData())
-						+ "\n额外数据：" + extraData);
-			}
-		} else {
-			if (message.getType() == GotyeMessageType.GotyeMessageTypeText) {
-				holder.tv.setText(message.getText());
-			} else {
-				holder.tv.setText("自定义消息：" + new String(message.getUserData()));
-			}
-		}
+                        holder.bv.loadDefaultFaceView();
+                        BQMM.getInstance().fetchBigEmojiByCodeList(chatPage, BQMMMessageHelper.parseFaceMsgData(data), new IFetchEmojisByCodeListCallback() {
+                            @Override
+                            public void onSuccess(final List<Emoji> emojis) {
+                                chatPage.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        holder.bv.showFaceMessage(emojis);
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onError(Throwable arg0) {
+
+                            }
+                        });
+                    } else {
+                        holder.bv.loadDefaultTextView();
+                        showTextInfoFromStr(holder.bv, BQMMMessageHelper.parseMixedMsgData(data), message);
+                    }
+                } catch (JSONException | NullPointerException e) {
+                    holder.bv.loadDefaultFaceView();
+                    holder.bv.getmTextView().setText(message.getText());
+                }
+            } else {
+                holder.bv.loadDefaultTextView();
+                holder.bv.getmTextView().setText("自定义消息：" + new String(message.getUserData())
+                        + "\n额外数据：" + extraData);
+            }
+        } else {
+            holder.bv.loadDefaultTextView();
+            if (message.getType() == GotyeMessageType.GotyeMessageTypeText) {
+                holder.bv.getmTextView().setText(message.getText());
+            } else {
+                holder.bv.getmTextView().setText("自定义消息：" + new String(message.getUserData()));
+            }
+        }
 
 		// 设置长按事件监听
 		if (getDirect(message) == MESSAGE_DIRECT_SEND) {
@@ -391,6 +416,40 @@ public class ChatMessageAdapter extends BaseAdapter {
 		}
 	}
 
+    private void showTextInfo(final BQMMMessageView tv_chatcontent, List<Object> emojis) {
+        tv_chatcontent.showMixedMessage(emojis);
+    }
+
+    private void showTextInfoFromStr(final BQMMMessageView tv_chatcontent, final List<Object> messagecontent, final GotyeMessage message) {
+        final String messageStr = BQMMMessageHelper
+                .parseMixedMsgToString(messagecontent);
+        if (!(BQMMMessageHelper.isMixedMessage(messagecontent))) {
+            tv_chatcontent.getmTextView().setText(messageStr);
+            return;
+        }
+        BQMM.getInstance().fetchSmallEmojiByCodeList(chatPage, BQMMMessageHelper.findEmojiFormMixedMsg(messagecontent), new IFetchEmojisByCodeListCallback() {
+            @Override
+            public void onSuccess(final List<Emoji> emojis) {
+                (chatPage).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (emojis == null) {
+                            tv_chatcontent.getmTextView().setText(messageStr);
+                            return;
+                        }
+                        showTextInfo(tv_chatcontent, BQMMMessageHelper.parseMixedMsg(messageStr, emojis));
+                    }
+                });
+            }
+
+            @Override
+            public void onError(Throwable arg0) {
+
+            }
+        });
+    }
+
+
 	private void handleVoiceMessage(final GotyeMessage message,
 			final ViewHolder holder, final int position, View convertView) {
 		holder.tv.setText(TimeUtil.getVoiceTime(message.getMedia()
@@ -432,7 +491,7 @@ public class ChatMessageAdapter extends BaseAdapter {
 			} else {
 				holder.iv_read_status.setVisibility(View.INVISIBLE);
 			}
-			
+
 			if(message.getSender().getType() == GotyeChatTargetType.GotyeChatTargetTypeCustomerService){
 				String csId = String.valueOf(message.getSender().getId());
 				holder.tv_userId.setText(csId);
@@ -636,7 +695,11 @@ public class ChatMessageAdapter extends BaseAdapter {
 		TextView tv_file_name;
 		TextView tv_file_size;
 		TextView tv_file_download_state;
-	}
+        /**
+         * 表情MM表情显示View
+         */
+        BQMMMessageView bv;
+    }
 
 	public void refreshData(List<GotyeMessage> list) {
 		// TODO Auto-generated method stub
