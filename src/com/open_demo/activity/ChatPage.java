@@ -329,13 +329,6 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 		 * 初始化表情MM UI组件
 		 */
 		keyboard = (BQMMKeyboard) findViewById(R.id.emoji_keyboard);
-		findViewById(R.id.emoji).setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				moreTypeLayout.setVisibility(View.GONE);
-				keyboard.setVisibility(View.VISIBLE);
-			}
-		});
 		/**
 		 * 检测软键盘的打开和收起。在软键盘打开时，收起表情键盘。
 		 */
@@ -348,6 +341,37 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 					if (keyboard.getVisibility() == View.VISIBLE) {
 						keyboard.setVisibility(View.GONE);
 					}
+				}
+			}
+		});
+		/**
+		 * 表情键盘的收放逻辑
+		 */
+		findViewById(R.id.send_emoji).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (keyboard.getVisibility() == View.GONE) {
+					pressToVoice.setVisibility(View.GONE);
+					textMessage.setVisibility(View.VISIBLE);
+					voice_text_chage.setImageResource(R.drawable.voice_btn_selector);
+					showMoreType.setImageResource(R.drawable.send_selector);
+					showMoreType.setVisibility(View.GONE);
+					sendMessage.setVisibility(View.VISIBLE);
+					moreTypeForSend = true;
+					moreTypeLayout.setVisibility(View.GONE);
+					hideKeyboard();
+					if (activityRootView.getRootView().getHeight() - activityRootView.getHeight() > 100) {
+						new Handler().postDelayed(new Runnable() {
+							@Override
+							public void run() {
+								keyboard.setVisibility(View.VISIBLE);
+							}
+						}, 400);
+					} else {
+						keyboard.setVisibility(View.VISIBLE);
+					}
+				} else {
+					keyboard.setVisibility(View.GONE);
 				}
 			}
 		});
@@ -808,14 +832,10 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 				voice_text_chage
 						.setImageResource(R.drawable.voice_btn_selector);
 				showMoreType.setImageResource(R.drawable.send_selector);
-				/**
-				 * 在应发送文字时，隐藏“更多”按钮
-				 */
 				showMoreType.setVisibility(View.GONE);
 				sendMessage.setVisibility(View.VISIBLE);
 				moreTypeForSend = true;
 				moreTypeLayout.setVisibility(View.GONE);
-				keyboard.setVisibility(View.GONE);
 			} else {
 				pressToVoice.setVisibility(View.VISIBLE);
 				textMessage.setVisibility(View.GONE);
@@ -824,13 +844,11 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 						.setImageResource(R.drawable.change_to_text_press);
 
 				showMoreType.setImageResource(R.drawable.more_type_selector);
-				/**
-				 * 在应选择更多操作时，显示“更多”按钮
-				 */
 				showMoreType.setVisibility(View.VISIBLE);
 				sendMessage.setVisibility(View.GONE);
 				moreTypeForSend = false;
 				hideKeyboard();
+				keyboard.setVisibility(View.GONE);
 			}
 
 			break;
@@ -843,15 +861,8 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 			} else {
 				if (moreTypeLayout.getVisibility() == View.VISIBLE) {
 					moreTypeLayout.setVisibility(View.GONE);
-					keyboard.setVisibility(View.GONE);
-					pressToVoice.setVisibility(View.VISIBLE);
-					textMessage.setVisibility(View.GONE);
-					voice_text_chage.setImageResource(R.drawable.change_to_text_press);
-					showMoreType.setVisibility(View.VISIBLE);
-					sendMessage.setVisibility(View.GONE);
 				} else {
 					moreTypeLayout.setVisibility(View.VISIBLE);
-					keyboard.setVisibility(View.GONE);
 					if (chatType == 1 && api.supportRealtime(room) == true) {
 						moreTypeLayout.findViewById(R.id.real_time_voice_chat)
 								.setVisibility(View.VISIBLE);
@@ -861,11 +872,6 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 //						moreTypeLayout.findViewById(R.id.voice_to_text)
 //						.setVisibility(View.VISIBLE);
 //				}
-					pressToVoice.setVisibility(View.GONE);
-					textMessage.setVisibility(View.VISIBLE);
-					voice_text_chage.setImageResource(R.drawable.voice_btn_selector);
-					showMoreType.setVisibility(View.GONE);
-					sendMessage.setVisibility(View.VISIBLE);
 
 				}
 			}
@@ -910,7 +916,6 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 		}
 		api.startTalk(room, WhineMode.DEFAULT, true, Voice_MAX_TIME_LIMIT);
 		moreTypeLayout.setVisibility(View.GONE);
-		keyboard.setVisibility(View.GONE);
 	}
 
 	public void hideKeyboard() {

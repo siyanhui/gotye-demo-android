@@ -118,6 +118,15 @@
                 android:layout_centerVertical="true"
                 android:src="@drawable/voice_btn_selector" />
 
+            <!--增加一个打开表情键盘按钮-->
+            <ImageView
+                android:id="@+id/send_emoji"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@id/send_voice"
+                android:src="@drawable/send_emoji" />
+
             <!--将文字编辑框换成表情MM提供的BQMMEditView-->
             <com.melink.bqmmsdk.widget.BQMMEditView
                 android:id="@+id/text_msg_input"
@@ -127,7 +136,7 @@
                 android:layout_marginLeft="2dp"
                 android:layout_marginRight="2dp"
                 android:layout_toLeftOf="@+id/more_type"
-                android:layout_toRightOf="@+id/send_voice"
+                android:layout_toRightOf="@+id/send_emoji"
                 android:background="@drawable/chat_input_bg"
                 android:imeOptions="actionSend"
                 android:paddingBottom="0dp"
@@ -143,7 +152,7 @@
                 android:layout_marginLeft="2dp"
                 android:layout_marginRight="2dp"
                 android:layout_toLeftOf="@+id/more_type"
-                android:layout_toRightOf="@+id/send_voice"
+                android:layout_toRightOf="@+id/send_emoji"
                 android:background="@drawable/press_to_voice_selector"
                 android:padding="0dp"
                 android:text="按住 说话"
@@ -210,15 +219,6 @@
                 android:layout_weight="1"
                 android:src="@drawable/realtime_voice_selector"
                 android:visibility="gone" />
-
-            <!--增加一个用于打开表情键盘的按钮-->
-            <ImageView
-                android:id="@+id/emoji"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:src="@drawable/send_emoji_selector"
-                android:visibility="visible" />
         </LinearLayout>
         <!--增加表情键盘-->
         <com.melink.bqmmsdk.ui.keyboard.BQMMKeyboard
