@@ -22,7 +22,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -68,6 +70,7 @@ import com.melink.bqmmsdk.sdk.BQMMMessageHelper;
 import com.melink.bqmmsdk.sdk.IBqmmSendMessageListener;
 import com.melink.bqmmsdk.ui.keyboard.BQMMKeyboard;
 import com.melink.bqmmsdk.widget.BQMMEditView;
+import com.melink.bqmmsdk.widget.BQMMPopupViewTask;
 import com.melink.bqmmsdk.widget.BQMMSendButton;
 import com.open_demo.R;
 import com.open_demo.adapter.ChatMessageAdapter;
@@ -266,7 +269,7 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 					int code = 0;
 					if (chatType == 0) {
 						code = api
-								.startTalk(user, WhineMode.DEFAULT,false, 60 * 1000); 
+								.startTalk(user, WhineMode.DEFAULT,false, 60 * 1000);
 					} else if (chatType == 1) {
 						code = api.startTalk(room, WhineMode.DEFAULT, false,
 								60 * 1000);
@@ -274,7 +277,7 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 						code = api.startTalk(group, WhineMode.DEFAULT,false,
 								60 * 1000);
 					} else if (chatType == 3){
-						code = api.startTalk(cserver, WhineMode.DEFAULT, false, 
+						code = api.startTalk(cserver, WhineMode.DEFAULT, false,
 								60 * 1000);
 					}
 					int c = code;
@@ -296,7 +299,7 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 					// mPopupWindow.dismiss();------------------------------------------
 					break;
 				case MotionEvent.ACTION_CANCEL:
-					if (onRealTimeTalkFrom == 0) { 
+					if (onRealTimeTalkFrom == 0) {
 						return false;
 					}
 					Log.d("chat_page",
@@ -330,6 +333,26 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 			public void onClick(View v) {
 				moreTypeLayout.setVisibility(View.GONE);
 				keyboard.setVisibility(View.VISIBLE);
+			}
+		});
+		/**
+		 * 以下代码用于实现输入联想功能，例如用户输入“噗”的时候，如果已经下载了名为“噗”的表情，则弹出一个View显示这个表情，用户点击该View即可发送
+		 */
+		textMessage.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void onTextChanged(CharSequence text, int start, int before, int count) {
+				BQMMPopupViewTask popTask = BQMMPopupViewTask.create(ChatPage.this);
+				popTask.setEmojiEmoText(text.toString());
+				popTask.setPopupView(voice_text_chage);
+				BQMM.getInstance().startEmojiPopupView(popTask);
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
 			}
 		});
 		sendMessage = (BQMMSendButton) findViewById(R.id.send_message);
