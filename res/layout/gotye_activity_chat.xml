@@ -217,7 +217,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:src="@drawable/bqmm_emoji_loading"
+                android:src="@drawable/send_emoji_selector"
                 android:visibility="visible" />
         </LinearLayout>
         <!--增加表情键盘-->
