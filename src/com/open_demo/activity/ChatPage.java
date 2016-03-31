@@ -37,6 +37,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnCreateContextMenuListener;
 import android.view.View.OnTouchListener;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -333,6 +334,21 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 			public void onClick(View v) {
 				moreTypeLayout.setVisibility(View.GONE);
 				keyboard.setVisibility(View.VISIBLE);
+			}
+		});
+		/**
+		 * 检测软键盘的打开和收起。在软键盘打开时，收起表情键盘。
+		 */
+		final View activityRootView = getWindow().getDecorView().findViewById(android.R.id.content);
+		activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+			@Override
+			public void onGlobalLayout() {
+				int heightDiff = activityRootView.getRootView().getHeight() - activityRootView.getHeight();
+				if (heightDiff > 100) {//高度的差异基本上都是由软键盘造成的
+					if (keyboard.getVisibility() == View.VISIBLE) {
+						keyboard.setVisibility(View.GONE);
+					}
+				}
 			}
 		});
 		/**
