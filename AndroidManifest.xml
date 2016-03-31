@@ -38,6 +38,50 @@
             android:name="bqmm_app_secret"
             android:value="${bqmmAppSecret}" />
 
+        <!--以下是表情MM SDK中的Activity-->
+                <activity
+            android:name="com.melink.bqmmsdk.ui.store.EmojiPackageList"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" >
+        </activity>
+        <activity
+            android:name="com.melink.bqmmsdk.ui.store.EmojiDetail"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" >
+        </activity>
+        <activity
+            android:name="com.melink.bqmmsdk.ui.store.EmojiPackageDetail"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" >
+        </activity>
+        <activity
+            android:name="com.melink.bqmmsdk.ui.store.EmojiPackageDown"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" >
+        </activity>
+        <activity
+            android:name="com.melink.bqmmsdk.ui.store.EmojiPackageMyCollection"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" >
+        </activity>
+        <activity
+            android:name="com.melink.bqmmsdk.ui.store.EmojiPackageSetting"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" >
+        </activity>
+        <activity
+            android:name="com.melink.bqmmsdk.ui.store.ServiceDeclaration"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" >
+        </activity>
+
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="viFtt8GZqEAYdhn9cBSIbXDT" />
