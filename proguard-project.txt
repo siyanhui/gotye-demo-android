@@ -18,3 +18,18 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+-keepattributes *Annotation*,Signature,SourceFile,LineNumberTable,InnerClasses
+-keepclasseswithmembernames,includedescriptorclasses class * {
+    native <methods>;
+}
+-keep class **.R
+-keep class **.R$*{
+<fields>;
+}
+
+-keep class com.gotye.api.**{*;}
+-dontwarn com.gotye.api.**
+-keep class com.melink.** {*;}
+-dontwarn com.melink.**
+-keep class com.thirdparty.** {*;}
+-dontwarn com.thirdparty.**

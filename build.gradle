@@ -45,8 +45,11 @@ android {
     buildTypes {
         release {
             minifyEnabled true
-            proguardFiles 'proguard-project.txt'
+            proguardFile 'proguard-project.txt'
         }
+    }
+    lintOptions {
+        disable 'ResourceType'
     }
 }
 
