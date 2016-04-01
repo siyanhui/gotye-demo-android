@@ -71,7 +71,7 @@ import com.melink.bqmmsdk.sdk.BQMMMessageHelper;
 import com.melink.bqmmsdk.sdk.IBqmmSendMessageListener;
 import com.melink.bqmmsdk.ui.keyboard.BQMMKeyboard;
 import com.melink.bqmmsdk.widget.BQMMEditView;
-import com.melink.bqmmsdk.widget.BQMMPopupViewTask;
+import com.melink.bqmmsdk.task.BQMMPopupViewTask;
 import com.melink.bqmmsdk.widget.BQMMSendButton;
 import com.open_demo.R;
 import com.open_demo.adapter.ChatMessageAdapter;
@@ -383,7 +383,7 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 			public void onTextChanged(CharSequence text, int start, int before, int count) {
 				BQMMPopupViewTask popTask = BQMMPopupViewTask.create(ChatPage.this);
 				popTask.setEmojiEmoText(text.toString());
-				popTask.setPopupView(voice_text_chage);
+				popTask.setPopupViewAnchor(voice_text_chage);
 				BQMM.getInstance().startEmojiPopupView(popTask);
 			}
 

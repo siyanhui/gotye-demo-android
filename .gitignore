@@ -8,6 +8,7 @@
 # Java class files
 *.class
 
+.settings/
 # Generated files
 bin/
 gen/
