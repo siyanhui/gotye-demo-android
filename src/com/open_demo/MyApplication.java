@@ -45,11 +45,16 @@ public class MyApplication extends Application {
 		loadSelectedKey(this);
 		CrashApplication.getInstance(this).onCreate();
 		spf = getSharedPreferences(SHARE_PREFERENCE_NAME, Context.MODE_PRIVATE);
+		/**
+		 * BQMM集成
+		 * 调用初始化方法
+		 */
 		initBQMMSdk();
 	}
 
 	/**
-	 * 初始化表情MM SDK
+	 * BQMM集成
+	 * 初始化SDK
 	 */
 	private void initBQMMSdk() {
 		/**

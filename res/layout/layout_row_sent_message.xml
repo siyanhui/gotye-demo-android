@@ -28,8 +28,9 @@
             android:background="@drawable/mini_avatar_shadow"
               />
 
-        <com.melink.bqmmsdk.widget.BQMMMessageView
-            bqmm:isleftview="false"
+        <!--BQMM集成-->
+        <!--将TextView改为BQMMMessageText-->
+        <com.melink.bqmmsdk.widget.BQMMMessageText
              android:maxWidth="225.0dip"
             android:id="@+id/tv_chatcontent"
             android:layout_width="wrap_content"
@@ -39,7 +40,8 @@
              android:lineSpacingExtra="2dp"
              android:autoLink="web"
             android:layout_marginRight="@dimen/margin_chat_activity"
-            android:layout_toLeftOf="@id/iv_userhead" />
+            android:layout_toLeftOf="@id/iv_userhead"
+            android:background="@drawable/chatto_bg" />
         
      <!--    <TextView
             android:id="@+id/tv_userid"

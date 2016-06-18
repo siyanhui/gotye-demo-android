@@ -90,6 +90,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * BQMM集成
+ * 将继承的Activity类型改为FragmentActivity
+ */
 public class ChatPage extends FragmentActivity implements OnClickListener {
 	public static final int REALTIMEFROM_OTHER = 2;
 	public static final int REALTIMEFROM_SELF = 1;
@@ -107,6 +111,10 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 	private GotyeUser currentLoginUser;
 	private ImageView voice_text_chage;
 	private Button pressToVoice;
+	/**
+	 * BQMM集成
+	 * 将textMessage的类型改为BQMMEditView，并增加sendMessage和keyboard两个属性
+	 */
 	private BQMMEditView textMessage;
 	private BQMMSendButton sendMessage;
 	private BQMMKeyboard keyboard;
@@ -136,6 +144,7 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 	boolean isClick = false;
 
 	/**
+	 * BQMM集成
 	 * 两种表情消息类型，前者为图文混排表情，后者为大表情
 	 */
 	public static final String EMOJITYPE = "emojitype";
@@ -227,6 +236,10 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 
 		voice_text_chage = (ImageView) findViewById(R.id.send_voice);
 		pressToVoice = (Button) findViewById(R.id.press_to_voice_chat);
+		/**
+		 * BQMM集成
+		 * 将类型更改为BQMMEditView
+		 */
 		textMessage = (BQMMEditView) findViewById(R.id.text_msg_input);
 		showMoreType = (ImageView) findViewById(R.id.more_type);
 		moreTypeLayout = (LinearLayout) findViewById(R.id.more_type_layout);
@@ -326,10 +339,12 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 		setListViewInfo();
 
 		/**
-		 * 初始化表情MM UI组件
+		 * BQMM集成
+		 * 初始化UI组件
 		 */
 		keyboard = (BQMMKeyboard) findViewById(R.id.emoji_keyboard);
 		/**
+		 * BQMM集成
 		 * 检测软键盘的打开和收起。在软键盘打开时，收起表情键盘。
 		 */
 		final View activityRootView = getWindow().getDecorView().findViewById(android.R.id.content);
@@ -345,6 +360,7 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 			}
 		});
 		/**
+		 * BQMM集成
 		 * 表情键盘的收放逻辑
 		 */
 		findViewById(R.id.send_emoji).setOnClickListener(new OnClickListener() {
@@ -376,6 +392,7 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 			}
 		});
 		/**
+		 * BQMM集成
 		 * 以下代码用于实现输入联想功能，例如用户输入“噗”的时候，如果已经下载了名为“噗”的表情，则弹出一个View显示这个表情，用户点击该View即可发送
 		 */
 		textMessage.addTextChangedListener(new TextWatcher() {
@@ -392,6 +409,10 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 			public void afterTextChanged(Editable s) {
 			}
 		});
+		/**
+		 * BQMM集成
+		 * 初始化SDK
+		 */
 		sendMessage = (BQMMSendButton) findViewById(R.id.send_message);
 		BQMM bqmm = BQMM.getInstance();
 		bqmm.setEditView(textMessage);
@@ -399,7 +420,8 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 		bqmm.setSendButton(sendMessage);
 		bqmm.load();
 		/**
-		 * 在有表情消息需要发送的时候，表情MM SDK会调用这个监听器中的回调，发送消息的代码要写在这里
+		 * BQMM集成
+		 * 在有表情消息需要发送的时候，SDK会调用这个监听器中的回调，发送消息的代码要写在这里
 		 */
 		bqmm.setBqmmSendMsgListener(new IBqmmSendMessageListener() {
 			/**
@@ -435,6 +457,7 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 	}
 
 	/**
+	 * BQMM集成
 	 * 发送表情消息
 	 */
 	public void sendFaceText(String content, JSONArray msgData, String type) {
@@ -829,6 +852,10 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 				voice_text_chage
 						.setImageResource(R.drawable.voice_btn_selector);
 				showMoreType.setImageResource(R.drawable.send_selector);
+				/**
+				 * BQMM集成
+				 * 隐藏更多按钮，显示发送按钮
+				 */
 				showMoreType.setVisibility(View.GONE);
 				sendMessage.setVisibility(View.VISIBLE);
 				moreTypeForSend = true;
@@ -841,10 +868,18 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 						.setImageResource(R.drawable.change_to_text_press);
 
 				showMoreType.setImageResource(R.drawable.more_type_selector);
+				/**
+				 * BQMM集成
+				 * 显示更多按钮，隐藏发送按钮
+				 */
 				showMoreType.setVisibility(View.VISIBLE);
 				sendMessage.setVisibility(View.GONE);
 				moreTypeForSend = false;
 				hideKeyboard();
+				/**
+				 * BQMM集成
+				 * 隐藏键盘
+				 */
 				keyboard.setVisibility(View.GONE);
 			}
 

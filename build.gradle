@@ -1,5 +1,6 @@
 /**
- * 在开始使用表情MM SDK之前，开发者需要首先申请到一对AppID和AppSecret，并用它们初始化SDK。
+ * BQMM集成
+ * 在开始使用BQMM SDK之前，开发者需要首先申请到一对AppID和AppSecret，并用它们初始化SDK。
  * 为了运行本Demo，请在项目根目录下的local.properties中加入如下两行：
  * bqmm.appID=<申请到的AppID>
  * bqmm.appSecret=<申请到的AppSecret>
@@ -25,6 +26,7 @@ android {
     buildToolsVersion "22.0.1"
     defaultConfig {
         /**
+         * BQMM集成
          * 以下代码可以把appID和appSecret写入AndroidManifest
          */
         manifestPlaceholders = [bqmmAppID: bqmmAppID, bqmmAppSecret: bqmmAppSecret]
@@ -56,5 +58,9 @@ android {
 dependencies {
     compile 'com.android.support:support-v4:22.2.1'
     compile files('libs/gotyeapi.jar')
+    /**
+     * BQMM集成
+     * 增加对BQMM项目的依赖
+     */
     compile project(':BQMM_Lib')
 }

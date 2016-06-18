@@ -29,6 +29,7 @@ import com.melink.bqmmsdk.bean.Emoji;
 import com.melink.bqmmsdk.sdk.BQMM;
 import com.melink.bqmmsdk.sdk.BQMMMessageHelper;
 import com.melink.bqmmsdk.sdk.IFetchEmojisByCodeListCallback;
+import com.melink.bqmmsdk.widget.BQMMMessageText;
 import com.melink.bqmmsdk.widget.BQMMMessageView;
 import com.open_demo.R;
 import com.open_demo.activity.ChatPage;
@@ -206,9 +207,10 @@ public class ChatMessageAdapter extends BaseAdapter {
 				holder.head_iv = (ImageView) convertView
 						.findViewById(R.id.iv_userhead);
 				/**
-				 * 这里是表情MM的表情，或者文字内容
+				 * BQMM集成
+				 * 将类型改为BQMMMessageText
 				 */
-				holder.bv = (BQMMMessageView) convertView
+				holder.bv = (BQMMMessageText) convertView
 						.findViewById(R.id.tv_chatcontent);
 				holder.tv_userId = (TextView) convertView
 						.findViewById(R.id.tv_userid);
@@ -312,59 +314,38 @@ public class ChatMessageAdapter extends BaseAdapter {
 		}
 	}
 
+	/**
+	 * BQMM集成
+	 *在holder参数前增加final关键字，以便在方法内部的匿名类中使用
+     */
 	private void handleTextMessage(final GotyeMessage message, final ViewHolder holder,
 			final int position) {
 		// 设置内容
 		String extraData = message.getExtraData() == null ? null : new String(
 				message.getExtraData());
-		if (extraData != null) {
-			if (message.getType() == GotyeMessageType.GotyeMessageTypeText) {
-				try {
-					/**
-					 * 封装到extraData中的表情消息在此被解读，判断表情消息的类型，做出相应处理
-					 */
-					JSONObject extraObject = new JSONObject(extraData);
-					String type = extraObject.getString("txt_msgType");
-					JSONArray data = extraObject.getJSONArray("msg_data");
-					if (type.equals(ChatPage.FACETYPE)) {
-                        holder.bv.loadDefaultFaceView();
-                        BQMM.getInstance().fetchBigEmojiByCodeList(chatPage, BQMMMessageHelper.parseFaceMsgData(data), new IFetchEmojisByCodeListCallback() {
-                            @Override
-                            public void onSuccess(final List<Emoji> emojis) {
-                                chatPage.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        holder.bv.showFaceMessage(emojis);
-                                    }
-                                });
-                            }
-
-                            @Override
-                            public void onError(Throwable arg0) {
-
-                            }
-                        });
-                    } else {
-                        holder.bv.loadDefaultTextView();
-                        showTextInfoFromStr(holder.bv, BQMMMessageHelper.parseMixedMsgData(data), message);
-                    }
-                } catch (JSONException | NullPointerException e) {
-                    holder.bv.loadDefaultFaceView();
-                    holder.bv.getmTextView().setText(message.getText());
-                }
-            } else {
-                holder.bv.loadDefaultTextView();
-                holder.bv.getmTextView().setText("自定义消息：" + new String(message.getUserData())
-                        + "\n额外数据：" + extraData);
-            }
-        } else {
-            holder.bv.loadDefaultTextView();
-            if (message.getType() == GotyeMessageType.GotyeMessageTypeText) {
-                holder.bv.getmTextView().setText(message.getText());
-            } else {
-                holder.bv.getmTextView().setText("自定义消息：" + new String(message.getUserData()));
-            }
-        }
+		if (message.getType() == GotyeMessageType.GotyeMessageTypeText) {
+			/**
+			 * BQMM集成
+			 * 以下是新增加的发送消息逻辑
+			 */
+			String type;
+			JSONArray data;
+			try {
+				/**
+				 * 封装到extraData中的表情消息在此被解读，判断表情消息的类型，做出相应处理
+				 */
+				JSONObject extraObject = new JSONObject(extraData);
+				type = extraObject.getString("txt_msgType");
+				data = extraObject.getJSONArray("msg_data");
+			} catch (JSONException | NullPointerException e) {
+				type = "";
+				data = null;
+			}
+			holder.bv.showMessage(String.valueOf(message.getId()), message.getText(), type, data);
+		} else {
+			holder.bv.showMessage(String.valueOf(message.getId()), "自定义消息：" + new String(message.getUserData())
+					+ "\n额外数据：" + extraData, "", null);
+		}
 
 		// 设置长按事件监听
 		if (getDirect(message) == MESSAGE_DIRECT_SEND) {
@@ -416,10 +397,13 @@ public class ChatMessageAdapter extends BaseAdapter {
 		}
 	}
 
-    private void showTextInfo(final BQMMMessageView tv_chatcontent, List<Object> emojis) {
-        tv_chatcontent.showMixedMessage(emojis);
-    }
-
+	/**
+	 * BQMM集成
+	 * 在BQMMMessageView中显示消息
+	 * @param tv_chatcontent
+	 * @param messagecontent
+	 * @param message
+     */
     private void showTextInfoFromStr(final BQMMMessageView tv_chatcontent, final List<Object> messagecontent, final GotyeMessage message) {
         final String messageStr = BQMMMessageHelper
                 .parseMixedMsgToString(messagecontent);
@@ -437,7 +421,7 @@ public class ChatMessageAdapter extends BaseAdapter {
                             tv_chatcontent.getmTextView().setText(messageStr);
                             return;
                         }
-                        showTextInfo(tv_chatcontent, BQMMMessageHelper.parseMixedMsg(messageStr, emojis));
+						tv_chatcontent.showMixedMessage(BQMMMessageHelper.parseMixedMsg(messageStr, emojis));
                     }
                 });
             }
@@ -696,9 +680,10 @@ public class ChatMessageAdapter extends BaseAdapter {
 		TextView tv_file_size;
 		TextView tv_file_download_state;
         /**
-         * 表情MM表情显示View
+		 * BQMM集成
+         * 表情显示专用View
          */
-        BQMMMessageView bv;
+        BQMMMessageText bv;
     }
 
 	public void refreshData(List<GotyeMessage> list) {

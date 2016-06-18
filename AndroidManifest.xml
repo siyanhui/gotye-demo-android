@@ -30,6 +30,7 @@
         android:label="@string/app_name"
         android:persistent="true"
         android:theme="@style/AppTheme" >
+        <!--BQMM集成-->
         <!--以下两条metadata的值都是占位信息，具体的值是在build.gradle中设置的。如果项目没有使用Android Studio，请把占位符改成实际的ID和Secret-->
         <meta-data
             android:name="bqmm_app_id"
@@ -38,8 +39,9 @@
             android:name="bqmm_app_secret"
             android:value="${bqmmAppSecret}" />
 
-        <!--以下是表情MM SDK中的Activity-->
-                <activity
+        <!--BQMM集成-->
+        <!--以下是SDK中的Activity-->
+        <activity
             android:name="com.melink.bqmmsdk.ui.store.EmojiPackageList"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
