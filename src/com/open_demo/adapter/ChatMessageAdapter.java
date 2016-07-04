@@ -25,12 +25,7 @@ import com.gotye.api.GotyeMessage;
 import com.gotye.api.GotyeMessageStatus;
 import com.gotye.api.GotyeMessageType;
 import com.gotye.api.GotyeUser;
-import com.melink.bqmmsdk.bean.Emoji;
-import com.melink.bqmmsdk.sdk.BQMM;
-import com.melink.bqmmsdk.sdk.BQMMMessageHelper;
-import com.melink.bqmmsdk.sdk.IFetchEmojisByCodeListCallback;
 import com.melink.bqmmsdk.widget.BQMMMessageText;
-import com.melink.bqmmsdk.widget.BQMMMessageView;
 import com.open_demo.R;
 import com.open_demo.activity.ChatPage;
 import com.open_demo.activity.ShowBigImage;
@@ -396,43 +391,6 @@ public class ChatMessageAdapter extends BaseAdapter {
 			}
 		}
 	}
-
-	/**
-	 * BQMM集成
-	 * 在BQMMMessageView中显示消息
-	 * @param tv_chatcontent
-	 * @param messagecontent
-	 * @param message
-     */
-    private void showTextInfoFromStr(final BQMMMessageView tv_chatcontent, final List<Object> messagecontent, final GotyeMessage message) {
-        final String messageStr = BQMMMessageHelper
-                .parseMixedMsgToString(messagecontent);
-        if (!(BQMMMessageHelper.isMixedMessage(messagecontent))) {
-            tv_chatcontent.getmTextView().setText(messageStr);
-            return;
-        }
-        BQMM.getInstance().fetchSmallEmojiByCodeList(chatPage, BQMMMessageHelper.findEmojiFormMixedMsg(messagecontent), new IFetchEmojisByCodeListCallback() {
-            @Override
-            public void onSuccess(final List<Emoji> emojis) {
-                (chatPage).runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (emojis == null) {
-                            tv_chatcontent.getmTextView().setText(messageStr);
-                            return;
-                        }
-						tv_chatcontent.showMixedMessage(BQMMMessageHelper.parseMixedMsg(messageStr, emojis));
-                    }
-                });
-            }
-
-            @Override
-            public void onError(Throwable arg0) {
-
-            }
-        });
-    }
-
 
 	private void handleVoiceMessage(final GotyeMessage message,
 			final ViewHolder holder, final int position, View convertView) {
