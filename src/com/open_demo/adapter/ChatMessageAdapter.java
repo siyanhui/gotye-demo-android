@@ -203,10 +203,11 @@ public class ChatMessageAdapter extends BaseAdapter {
 						.findViewById(R.id.iv_userhead);
 				/**
 				 * BQMM集成
-				 * 将类型改为BQMMMessageText
+				 * 将类型改为BQMMMessageText，然后指定大表情的显示大小
 				 */
 				holder.bv = (BQMMMessageText) convertView
 						.findViewById(R.id.tv_chatcontent);
+				holder.bv.setStickerSize(holder.bv.getContext().getResources().getDimensionPixelSize(R.dimen.bqmm_sticker_size));
 				holder.tv_userId = (TextView) convertView
 						.findViewById(R.id.tv_userid);
 				holder.tv_delivered = (TextView) convertView

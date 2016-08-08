@@ -19,4 +19,6 @@
     <dimen name="sidebar_text_size">10dp</dimen>
      <dimen name="image_thumbnail_size">100dp</dimen>
     <dimen name="image_thumbnail_spacing">1dp</dimen>
+    <!--BQMM集成 指定大表情的显示大小-->
+    <dimen name="bqmm_sticker_size">100dp</dimen>
 </resources>
