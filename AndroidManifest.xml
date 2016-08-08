@@ -176,6 +176,19 @@
         </receiver>
 
         <service android:name="com.open_demo.GotyeService"/>
+
+        <meta-data
+            android:name="BUGLY_APPID"
+            android:value="04593b8446" />
+        <meta-data
+            android:name="BUGLY_APP_VERSION"
+            android:value="1.7.1" />
+        <meta-data
+            android:name="BUGLY_APP_CHANNEL"
+            android:value="alpha" />
+        <meta-data
+            android:name="BUGLY_ENABLE_DEBUG"
+            android:value="true" />
     </application>
 
 </manifest>

@@ -8,6 +8,7 @@ import com.gotye.api.GotyeGroup;
 import com.gotye.api.GotyeUser;
 import com.melink.bqmmsdk.sdk.BQMM;
 import com.open_demo.main.MainActivity;
+import com.tencent.bugly.crashreport.CrashReport;
 
 import android.R.integer;
 import android.app.Application;
@@ -50,6 +51,7 @@ public class MyApplication extends Application {
 		 * 调用初始化方法
 		 */
 		initBQMMSdk();
+		CrashReport.initCrashReport(getApplicationContext());
 	}
 
 	/**

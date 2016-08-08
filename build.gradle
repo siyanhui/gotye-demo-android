@@ -12,6 +12,11 @@ properties.load(project.rootProject.file('local.properties').newDataInputStream(
 def bqmmAppID = properties.getProperty('bqmm.appID')
 def bqmmAppSecret = properties.getProperty('bqmm.appSecret')
 
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
 buildscript {
     repositories {
         mavenCentral()
@@ -31,7 +36,6 @@ android {
          */
         manifestPlaceholders = [bqmmAppID: bqmmAppID, bqmmAppSecret: bqmmAppSecret]
     }
-
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -43,7 +47,6 @@ android {
             jniLibs.srcDirs = ['libs']
         }
     }
-
     buildTypes {
         release {
             minifyEnabled true
@@ -63,4 +66,5 @@ dependencies {
      * 增加对BQMM项目的依赖
      */
     compile project(':BQMM_Lib')
+    compile 'com.tencent.bugly:crashreport:latest.release'
 }
