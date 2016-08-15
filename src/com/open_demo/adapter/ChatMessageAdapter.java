@@ -337,9 +337,9 @@ public class ChatMessageAdapter extends BaseAdapter {
 				type = "";
 				data = null;
 			}
-			holder.bv.showMessage(String.valueOf(message.getId()), message.getText(), type, data);
+			holder.bv.showMessage(message.getText(), type, data);
 		} else {
-			holder.bv.showMessage(String.valueOf(message.getId()), "自定义消息：" + new String(message.getUserData())
+			holder.bv.showMessage("自定义消息：" + new String(message.getUserData())
 					+ "\n额外数据：" + extraData, "", null);
 		}
 

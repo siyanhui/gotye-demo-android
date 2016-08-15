@@ -398,7 +398,7 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 		textMessage.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void onTextChanged(CharSequence text, int start, int before, int count) {
-				BQMM.getInstance().startShortcutPopupWindow(ChatPage.this,text.toString(),voice_text_chage);
+				BQMM.getInstance().startShortcutPopupWindow(text.toString(), voice_text_chage);
 			}
 
 			@Override
