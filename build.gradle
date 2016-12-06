@@ -66,5 +66,5 @@ dependencies {
      * 增加对BQMM项目的依赖
      */
     compile project(':BQMM_Lib')
-    compile 'com.tencent.bugly:crashreport:latest.release'
+    compile 'com.tencent.bugly:crashreport:2.3.1'
 }
