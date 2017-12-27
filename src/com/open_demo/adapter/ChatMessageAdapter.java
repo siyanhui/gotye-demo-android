@@ -325,19 +325,29 @@ public class ChatMessageAdapter extends BaseAdapter {
 			 * 以下是新增加的发送消息逻辑
 			 */
 			String type;
-			JSONArray data;
+			JSONArray data = null;
+			JSONObject gifData = null;
 			try {
 				/**
 				 * 封装到extraData中的表情消息在此被解读，判断表情消息的类型，做出相应处理
 				 */
 				JSONObject extraObject = new JSONObject(extraData);
 				type = extraObject.getString("txt_msgType");
-				data = extraObject.getJSONArray("msg_data");
+				if (TextUtils.equals(type,ChatPage.WEBTYPE)){
+					gifData = extraObject.getJSONObject("msg_data");
+				}else {
+					data = extraObject.getJSONArray("msg_data");
+				}
 			} catch (JSONException | NullPointerException e) {
 				type = "";
 				data = null;
 			}
-			holder.bv.showMessage(message.getText(), type, data);
+			if (TextUtils.equals(type,ChatPage.WEBTYPE)){
+				holder.bv.showBQMMGif(gifData.optString("data_id"), gifData.optString("sticker_url"), gifData.optInt("w"), gifData.optInt("h"), gifData.optInt("is_gif"));
+			}else {
+				holder.bv.showMessage(message.getText(), type, data);
+			}
+			
 		} else {
 			holder.bv.showMessage("自定义消息：" + new String(message.getUserData())
 					+ "\n额外数据：" + extraData, "", null);

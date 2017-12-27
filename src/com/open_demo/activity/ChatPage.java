@@ -65,16 +65,20 @@ import com.gotye.api.GotyeRoom;
 import com.gotye.api.GotyeStatusCode;
 import com.gotye.api.GotyeUser;
 import com.gotye.api.WhineMode;
+import com.melink.bqmmsdk.bean.BQMMGif;
 import com.melink.bqmmsdk.bean.Emoji;
 import com.melink.bqmmsdk.sdk.BQMM;
 import com.melink.bqmmsdk.sdk.BQMMMessageHelper;
 import com.melink.bqmmsdk.sdk.IBqmmSendMessageListener;
 import com.melink.bqmmsdk.ui.keyboard.BQMMKeyboard;
+import com.melink.bqmmsdk.ui.keyboard.IGifButtonClickListener;
 import com.melink.bqmmsdk.widget.BQMMEditView;
 import com.melink.bqmmsdk.task.BQMMPopupViewTask;
 import com.melink.bqmmsdk.widget.BQMMSendButton;
 import com.open_demo.R;
 import com.open_demo.adapter.ChatMessageAdapter;
+import com.open_demo.bqmmgif.BQMMGifManager;
+import com.open_demo.bqmmgif.IBqmmSendGifListener;
 import com.open_demo.main.MainActivity;
 import com.open_demo.util.CommonUtils;
 import com.open_demo.util.Constants;
@@ -149,6 +153,10 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 	 */
 	public static final String EMOJITYPE = "emojitype";
 	public static final String FACETYPE = "facetype";
+	/**
+	 * BQMM 2.0.0版本后新增GIf消息类型
+	 */
+	public static final String WEBTYPE = "webtype";
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -393,32 +401,27 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 		});
 		/**
 		 * BQMM集成
-		 * 以下代码用于实现输入联想功能，例如用户输入“噗”的时候，如果已经下载了名为“噗”的表情，则弹出一个View显示这个表情，用户点击该View即可发送
-		 */
-		textMessage.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void onTextChanged(CharSequence text, int start, int before, int count) {
-				BQMM.getInstance().startShortcutPopupWindow(text.toString(), voice_text_chage);
-			}
-
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-			}
-		});
-		/**
-		 * BQMM集成
 		 * 初始化SDK
 		 */
 		sendMessage = (BQMMSendButton) findViewById(R.id.send_message);
 		BQMM bqmm = BQMM.getInstance();
 		bqmm.setEditView(textMessage);
-		bqmm.setKeyboard(keyboard);
+		bqmm.setKeyboard(keyboard, new IGifButtonClickListener() {
+			@Override
+			public void didClickGifTab() {
+				keyboard.setVisibility(View.GONE);
+				showKeyboard(textMessage);
+				new Handler().postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						BQMMGifManager.getInstance(getBaseContext()).showTrending();
+					}
+				},300);
+			}
+		});
 		bqmm.setSendButton(sendMessage);
 		bqmm.load();
+		BQMMGifManager.getInstance(getBaseContext()).addEditViewListeners();
 		/**
 		 * BQMM集成
 		 * 在有表情消息需要发送的时候，SDK会调用这个监听器中的回调，发送消息的代码要写在这里
@@ -453,7 +456,47 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 				}
 			}
 		});
-
+		BQMMGifManager.getInstance(getBaseContext()).setBQMMSendGifListener(new IBqmmSendGifListener() {
+			@Override
+			public void onSendBQMMGif(BQMMGif bqmmGif) {
+				String content = "["+bqmmGif.getText()+"]";
+				JSONObject gifJsonObject = new JSONObject();
+				try {
+					gifJsonObject.put("data_id",bqmmGif.getSticker_id());
+					gifJsonObject.put("h",bqmmGif.getSticker_height());
+					gifJsonObject.put("w",bqmmGif.getSticker_width());
+					gifJsonObject.put("sticker_url",bqmmGif.getSticker_url());
+					gifJsonObject.put("is_gif",bqmmGif.getIs_gif());
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				GotyeMessage toSend = null;
+				if (chatType == 0) {
+					toSend = GotyeMessage.createTextMessage(currentLoginUser, o_user, content);
+				} else if (chatType == 1) {
+					toSend = GotyeMessage.createTextMessage(currentLoginUser, o_room, content);
+				} else if (chatType == 2) {
+					toSend = GotyeMessage.createTextMessage(currentLoginUser, o_group, content);
+				} else if (chatType == 3) {
+					toSend = GotyeMessage.createTextMessage(currentLoginUser, o_cserver, content);
+				}
+				if (toSend != null) try {
+					/**
+					 * 将表情的信息进行封装，放到消息的extraData中
+					 */
+					JSONObject extra = new JSONObject();
+					extra.put("txt_msgType", WEBTYPE);
+					extra.put("msg_data", gifJsonObject);
+					toSend.putExtraData(extra.toString().getBytes());
+					int code = api.sendMessage(toSend);
+					Log.d("", String.valueOf(code));
+					adapter.addMsgToBottom(toSend);
+					refreshToTail();
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 	/**
@@ -959,6 +1002,11 @@ public class ChatPage extends FragmentActivity implements OnClickListener {
 				InputMethodManager.HIDE_NOT_ALWAYS);
 	}
 
+	public void showKeyboard(View view) {
+		view.requestFocus();
+		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.showSoftInput(view, 0);
+	}
 	private void takePic() {
 		Intent intent;
 		intent = new Intent(Intent.ACTION_PICK,

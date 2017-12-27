@@ -1,12 +1,12 @@
 apply plugin: 'com.android.library'
 
 dependencies {
-    compile files('libs/bqmm_v1.7.15.jar')
+    compile files('libs/bqmm_v2.0.0.jar')
 }
 
 android {
     compileSdkVersion 19
-    buildToolsVersion '25.0.2'
+    buildToolsVersion '26.0.2'
 
     sourceSets {
         main {
